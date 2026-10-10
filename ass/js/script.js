@@ -124,6 +124,29 @@ document.addEventListener("DOMContentLoaded", () => {
         mostrarError("Error de conexión. Reintentando...");
     };
 
+    // Mismos nombres reservados que valida el backend (aquí solo para dar
+    // feedback inmediato sin ir al servidor; el control REAL es el backend).
+    const RESERVADOS = new Set([
+        "admin", "administrator", "administrador", "root", "superuser", "su",
+        "sysadmin", "system", "sistema", "moderator", "moderador", "mod",
+        "staff", "owner", "propietario", "host", "server", "servidor",
+        "webmaster", "postmaster", "support", "soporte", "guest", "invitado",
+        "anonymous", "anonimo", "null", "none", "undefined", "nan",
+        "console", "operator", "service", "oficial", "official", "help",
+        "ayuda", "bot", "chatbot", "chat", "me", "yo", "my", "mine",
+        "god", "dios",
+    ]);
+    const esNombreReservado = (nombre) => {
+        const limpio = nombre
+            .normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/0/g, "o").replace(/1/g, "l").replace(/3/g, "e")
+            .replace(/4/g, "a").replace(/5/g, "s").replace(/7/g, "t")
+            .replace(/@/g, "a").replace(/\$/g, "s")
+            .replace(/[^a-z0-9]/g, "");
+        return RESERVADOS.has(limpio) || RESERVADOS.has(limpio.replace(/\d+$/, ""));
+    };
+
     // ============================================================
     // LÓGICA DE LA PÁGINA LOGIN (index.html)
     // ============================================================
@@ -133,6 +156,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const n = usernameInput.value.trim();
             if (n.length < 2) {
                 mostrarError("Escribe un nombre válido (mín. 2 caracteres)");
+                usernameInput.focus();
+                return;
+            }
+            if (esNombreReservado(n)) {
+                mostrarError("Ese nombre está reservado, elige otro");
                 usernameInput.focus();
                 return;
             }
@@ -151,7 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     ? "Clave rechazada (401): ¿fue rotada? Actualiza PUBLIC_TOKEN."
                     : e.status === 429
                         ? "Demasiados intentos (429). Espera un minuto."
-                        : (e.message || "Error autenticando. ¿Túnel activo?");
+                        : e.status === 403
+                            ? "Ese nombre está reservado, elige otro."
+                            : (e.message || "Error autenticando. ¿Túnel activo?");
                 mostrarError(msg);
             }
         }
