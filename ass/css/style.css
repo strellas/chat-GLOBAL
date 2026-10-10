@@ -1,0 +1,220 @@
+/* ================================================
+   STYLE.CSS — Base compartida (login + chat)
+   Variables, reset, login screen, utilidades
+   ================================================== */
+
+/* --- VARIABLES GLOBALES --- */
+:root {
+    --bg-base: #0f111a;
+    --bg-surface: rgba(22, 25, 37, 0.7);
+    --bg-elevated: #1e2235;
+    --bg-input: rgba(30, 34, 53, 0.8);
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --text-main: #f3f4f6;
+    --text-sub: #b0b6c3;
+    --text-muted: #9aa1ad;
+    --border: rgba(255, 255, 255, 0.08);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+/* --- RESET --- */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Inter', sans-serif; 
+}
+
+/* --- BASE --- */
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden; /* El chat gestiona su propio scroll */
+}
+
+/* Respetar a quien pide menos movimiento (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+body {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    background-color: var(--bg-base);
+    background-image: radial-gradient(circle at 50% 0%, #1a1f35 0%, #0f111a 50%);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* --- UTILIDADES --- */
+.hidden { 
+    display: none !important; 
+}
+
+/* ================================================
+   LOGIN SCREEN (solo index.html)
+   ================================================== */
+#login-screen {
+    position: fixed; 
+    inset: 0; 
+    z-index: 100;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    backdrop-filter: blur(8px);
+    background-color: rgba(15, 17, 26, 0.6);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+#login-screen.fade-out { 
+    opacity: 0; 
+    pointer-events: none; 
+    transform: scale(1.05); 
+}
+
+.login-card {
+    background: var(--bg-surface);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    padding: 3rem 2.5rem;
+    border-radius: 24px;
+    width: 100%; 
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.login-card::before {
+    content: ''; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+@keyframes slideUp { 
+    from { transform: translateY(30px); opacity: 0; } 
+    to { transform: translateY(0); opacity: 1; } 
+}
+
+.logo-container {
+    width: 60px; 
+    height: 60px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 16px;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    margin: 0 auto 1.5rem;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.login-card h2 { 
+    font-size: 1.8rem; 
+    font-weight: 700; 
+    margin-bottom: 0.5rem; 
+    letter-spacing: -0.5px; 
+}
+
+.login-card p { 
+    color: var(--text-sub); 
+    margin-bottom: 2rem; 
+    font-size: 0.95rem; 
+}
+
+.input-wrapper { 
+    position: relative; 
+    margin-bottom: 1.5rem; 
+}
+
+#username-input {
+    width: 100%; 
+    padding: 16px 20px;
+    background: var(--bg-input);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    color: var(--text-main); 
+    font-size: 1rem;
+    outline: none; 
+    transition: all 0.2s ease;
+}
+
+#username-input:focus {
+    border-color: var(--primary);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow-glow);
+}
+
+#username-input::placeholder { 
+    color: var(--text-muted); 
+}
+
+.error-msg {
+    color: var(--danger); 
+    font-size: 0.85rem; 
+    margin-top: 10px;
+    min-height: 1.2em; 
+    opacity: 0; 
+    transition: opacity 0.2s;
+    display: block;
+}
+
+.error-msg.visible { 
+    opacity: 1; 
+}
+
+#enter-btn {
+    width: 100%; 
+    padding: 16px;
+    background: var(--primary); 
+    color: white;
+    border: none; 
+    border-radius: 12px;
+    font-size: 1.05rem; 
+    font-weight: 600;
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 10px;
+}
+
+#enter-btn:hover { 
+    background: var(--primary-hover); 
+    transform: translateY(-2px); 
+    box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.5); 
+}
+
+#enter-btn:active { 
+    transform: translateY(0); 
+}
+
+#enter-btn:disabled { 
+    opacity: 0.7; 
+    cursor: not-allowed; 
+}
+
+/* --- RESPONSIVE (login) --- */
+@media (max-width: 600px) {
+    .login-card { 
+        margin: 20px; 
+        padding: 2rem; 
+    }
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Chat en tiempo real">
+    <meta name="theme-color" content="#0f111a">
+    <title>Acces via BACKEND | +JWT</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="ass/css/style.css">
+    <link rel="stylesheet" href="ass/css/chat.css">
+</head>
+<body>
+
+    <!-- ==================== PANTALLA DE LOGIN ==================== -->
+    <div id="login-screen" aria-label="Pantalla de inicio de sesión">
+        <div class="login-card">
+            <div class="logo-container">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 22V12" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 7l10 5 10-5" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+
+            <h2> Acceso </h2>
+            <p>Ingresa NOMBRE</p>
+
+            <div class="input-wrapper">
+                <input
+                    type="text"
+                    id="username-input"
+                    placeholder="Tu nombre"
+                    maxlength="20"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    aria-label="Nombre de usuario"
+                >
+            </div>
+
+            <div id="error-msg" class="error-msg" role="alert" aria-live="polite"></div>
+
+            <button id="enter-btn" type="button" aria-label="Autenticar y entrar al chat">
+                <span> Entrar!</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                    <polyline points="10 17 15 12 10 7"></polyline>
+                    <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- El script es un módulo: script.js importa api.js por su cuenta -->
+    <script type="module" src="ass/js/script.js"></script>
+</body>
+</html>
