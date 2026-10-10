@@ -35,6 +35,9 @@ let ws = null;
 let jwt = null;
 let deviceId = null;
 let nombreUsuario = "";
+// Contraseña del admin SOLO en memoria (nunca en localStorage): permite
+// renovar el JWT silenciosamente sin que vuelva a pedirla.
+let adminPassword = "";
 let isConnecting = false;
 let reconnectAttempts = 0;
 let reconnectTimer = null;
@@ -95,8 +98,10 @@ function limpiarSesion() {
 }
 
 // --- AUTENTICACIÓN ---
-export async function pedirJWT(usuario) {
+// `password` solo lo usa la cuenta admin (Strellas); el resto va vacío.
+export async function pedirJWT(usuario, password = "") {
     nombreUsuario = usuario;
+    adminPassword = password || "";
 
     // Validación rápida de configuración
     if (API_CONFIG.PUBLIC_TOKEN === "***" || API_CONFIG.PUBLIC_TOKEN.length < 10) {
@@ -109,7 +114,7 @@ export async function pedirJWT(usuario) {
     const r = await fetch(`${API_CONFIG.BASE_HTTP}/auth`, {
         method: "POST",
         headers,
-        body: JSON.stringify({ usuario })
+        body: JSON.stringify({ usuario, password })
     });
 
     if (!r.ok) {
@@ -135,6 +140,7 @@ export async function pedirJWT(usuario) {
 
 // --- LOGOUT LIMPIO ---
 export function cerrarSesion() {
+    adminPassword = "";        // Limpia la contraseña admin de memoria
     sesionCerrada = true;      // Bloquea reconexiones automáticas
     if (reconnectTimer) {
         clearTimeout(reconnectTimer);
@@ -180,7 +186,7 @@ export function conectar(onMessage, onStatusChange, onError) {
 
     // Sin token pero con usuario conocido → pedir uno nuevo y conectar
     if (!jwt && nombreUsuario) {
-        pedirJWT(nombreUsuario)
+        pedirJWT(nombreUsuario, adminPassword)
             .then(() => iniciarConexion(onMessage, onStatusChange, onError))
             .catch((e) => {
                 if (e.status === 401) onStatusChange('offline', "Clave rechazada (401). ¿Se rotó la clave?");

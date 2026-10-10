@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const errorMsg = $("error-msg");
     const messageInput = $("message-input");
     const usernameInput = $("username-input");
+    const passwordWrapper = $("password-wrapper");
+    const passwordInput = $("password-input");
     const enterBtn = $("enter-btn");
     const messageForm = $("message-form");
     const logoutBtn = $("logout-btn");
@@ -147,6 +149,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return RESERVADOS.has(limpio) || RESERVADOS.has(limpio.replace(/\d+$/, ""));
     };
 
+    // La cuenta admin (Strellas) es la ÚNICA que pide contraseña.
+    // (El control real es el backend; aquí solo se adapta la interfaz.)
+    const esCuentaAdmin = (nombre) => nombre
+        .normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase().replace(/[^a-z0-9]/g, "") === "strellas";
+
+    // Muestra/oculta el campo de contraseña según el nombre escrito.
+    function actualizarCampoPassword() {
+        if (!passwordWrapper) return;
+        const admin = esCuentaAdmin(usernameInput.value.trim());
+        passwordWrapper.hidden = !admin;
+        if (!admin && passwordInput) passwordInput.value = "";
+    }
+
     // ============================================================
     // LÓGICA DE LA PÁGINA LOGIN (index.html)
     // ============================================================
@@ -159,9 +175,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 usernameInput.focus();
                 return;
             }
-            if (esNombreReservado(n)) {
+            const admin = esCuentaAdmin(n);
+            if (!admin && esNombreReservado(n)) {
                 mostrarError("Ese nombre está reservado, elige otro");
                 usernameInput.focus();
+                return;
+            }
+            const password = admin && passwordInput ? passwordInput.value : "";
+            if (admin && !password) {
+                mostrarError("Introduce la contraseña de administrador");
+                passwordInput.focus();
                 return;
             }
 
@@ -170,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 // pedirJWT guarda JWT + deviceId + usuario en localStorage
-                await pedirJWT(n);
+                await pedirJWT(n, password);
                 // Autenticado → saltar a la página del chat
                 window.location.href = "chat/chat.html";
             } catch (e) {
@@ -180,16 +203,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     : e.status === 429
                         ? "Demasiados intentos (429). Espera un minuto."
                         : e.status === 403
-                            ? "Ese nombre está reservado, elige otro."
-                            : (e.message || "Error autenticando. ¿Túnel activo?");
+                            ? (admin ? "Contraseña incorrecta." : "Ese nombre está reservado, elige otro.")
+                            : e.status === 503
+                                ? "La cuenta admin no está configurada todavía."
+                                : (e.message || "Error autenticando. ¿Túnel activo?");
                 mostrarError(msg);
             }
         }
 
         enterBtn.addEventListener("click", entrarAlChat);
+        usernameInput.addEventListener("input", actualizarCampoPassword);
         usernameInput.addEventListener("keydown", e => {
-            if (e.key === "Enter") { e.preventDefault(); entrarAlChat(); }
+            if (e.key === "Enter") {
+                e.preventDefault();
+                // Si aparece el campo de contraseña, Enter pasa el foco a él.
+                if (passwordWrapper && !passwordWrapper.hidden && passwordInput) passwordInput.focus();
+                else entrarAlChat();
+            }
         });
+        if (passwordInput) {
+            passwordInput.addEventListener("keydown", e => {
+                if (e.key === "Enter") { e.preventDefault(); entrarAlChat(); }
+            });
+        }
         usernameInput.focus();
         return;   // ← en el login no hay nada más que hacer
     }

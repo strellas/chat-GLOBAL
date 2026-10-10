@@ -143,7 +143,8 @@ body {
     margin-bottom: 1.5rem; 
 }
 
-#username-input {
+#username-input,
+#password-input {
     width: 100%; 
     padding: 16px 20px;
     background: var(--bg-input);
@@ -155,14 +156,20 @@ body {
     transition: all 0.2s ease;
 }
 
-#username-input:focus {
+#username-input:focus,
+#password-input:focus {
     border-color: var(--primary);
     background: var(--bg-elevated);
     box-shadow: var(--shadow-glow);
 }
 
-#username-input::placeholder { 
+#username-input::placeholder,
+#password-input::placeholder { 
     color: var(--text-muted); 
+}
+
+.input-wrapper[hidden] {
+    display: none;
 }
 
 .error-msg {
